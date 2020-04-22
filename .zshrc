@@ -3,7 +3,7 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/devon/.oh-my-zsh"
-
+export PATH="/usr/local/share/chruby:$PATH"
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -97,28 +97,66 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias gp="git push origin $(git rev-parse --abbrev-ref HEAD)"
-alias gpf="gp --force-with-lease"
-alias dus="dev up && dev s --focus Products AdminNextFallback"
+# alias gitforce="git push --force-with-lease" ggfl~
+alias ds="dev s --focus Products"
+alias dus="dev up && ds"
 alias gfa="git fetch --all"
 alias pr="dev open pr"
-alias gresetorigin="gfa && git reset origin/$(git rev-parse --abbrev-ref HEAD)"
-alias ds="dev s --focus Products AdminNextFallback"
-
+alias basemaster="git fetch origin master && git rebase origin/master"
+alias tzip="tar -cvf devon_mack_101107726.tar *.c *.h Makefile README.txt"
+alias glog="git log --pretty --oneline"
+alias revert="git checkout master "
+alias resetmaster="git fetch origin master && git reset --hard origin/master"
+alias gcob="git cob"
+alias tophat="dev web tophat --branch "
 
 # Functions
 c() {
     if [ "$1" != "" ]
     then
         C_SCRIPT_FILENAME="$1"
-        gcc "$1"
+        OUT_NAME="${1%%.*}"
+        gcc -o "$OUT_NAME" "$1"
     else
-        gcc "$C_SCRIPT_FILENAME"
+        OUT_NAME="${C_SCRIPT_FILENAME%%.*}"
+        gcc -o "$OUT_NAME" "$C_SCRIPT_FILENAME"
     fi
     if [ $? = 0 ]
     then
-        ./a.out
+        ./$OUT_NAME
     fi
+}
+
+cm() {
+    if [ "$1" != "" ]
+    then
+        C_SCRIPT_FILENAME="$1"
+        OUT_NAME="${1%%.*}"
+        make
+    else
+        OUT_NAME="${C_SCRIPT_FILENAME%%.*}"
+        make
+    fi
+    if [ $? = 0 ]
+    then
+        ./$OUT_NAME
+    fi
+}
+
+ggc() {
+    git fetch origin $1 && git checkout $1 && git reset --hard origin/$1
+}
+
+calc() {
+  echo $(($@))
+}
+
+relative() {
+  node -e "let r = path.relative(path.dirname('$1'), '$2'); r=r.startsWith('.') ? r : './' + r; console.log(r);"
+}
+
+lsoverride() {
+    ls |  egrep --color '.yml'
 }
 
 DEFAULT_USER=$USER
@@ -130,3 +168,5 @@ if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 export PATH=$PATH:~/bin
 export PATH="/usr/local/share/chruby:$PATH"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
